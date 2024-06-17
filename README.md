@@ -1,1 +1,1 @@
-"# AI-Assistant" 
+These scripts are incomplete but I will one day create a single one that incorporates various APIs and create a personal 'Alexa' that doesn't store my information in a tech-giant's database for targeted ad purposes :).
