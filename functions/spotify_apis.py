@@ -132,14 +132,6 @@ def start_spotify(access_token):
         return "error"        
 
 
-     
-
-
-    return "spotify ready for command"
-
-
-
-
 def spotify_api(access_token, command):
     print("In Spotify API function with command:", command)
 

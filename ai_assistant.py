@@ -72,7 +72,7 @@ def parseCommand(lastCall):
     with sr.Microphone() as source:
         print("adjuting for ambient noise")
         listener.adjust_for_ambient_noise(source, duration= 3)
-        listener.pause_threshold = 2
+        listener.pause_threshold = 1
         listener.energy_threshold = 300
         print("listening for a command")
         input_speech = listener.listen(source, timeout = None, phrase_time_limit = None)
@@ -87,12 +87,12 @@ def parseCommand(lastCall):
         print("I did not quite catch that")
         print(exception)
         print("returning None to main function")
-        bad_listens += 1
+        # bad_listens += 1
         return None
     
     # global lastCall
 
-    bad_listens = 0
+    # bad_listens = 0
     
     newCall = datetime.now().timestamp() * 1000
     
