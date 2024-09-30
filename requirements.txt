@@ -1,0 +1,7 @@
+SpeechRecognition
+pyttsx3
+requests
+playsound
+pycaw
+wikipedia-api
+wolframalpha

@@ -3,13 +3,11 @@ from logging.config import listen
 import speech_recognition as sr
 import pyttsx3
 import webbrowser
-import pyaudio
+# import pyaudio
 import time
 # import pygame
 import os
 from ctypes import *
-# from contextlib import contextmanager
-# from selenium import webdriver
 from playsound import playsound
 from functions.elevenlabs import gen_voice_response
 # from functions.spotify_player import spotify_player
