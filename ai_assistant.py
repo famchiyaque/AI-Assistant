@@ -8,6 +8,7 @@ import time
 # import pygame
 import os
 from ctypes import *
+from contextlib import contextmanager
 from playsound import playsound
 from functions.elevenlabs import gen_voice_response
 # from functions.spotify_player import spotify_player
@@ -15,7 +16,7 @@ from functions.wiki import wiki_search
 from functions.wolfram import search_wolframalpha
 from functions.greetings import get_greeting
 from functions.spotify_apis import spotify_api, get_spot_instance, start_spotify
-from functions.volume import mod_volume
+#from functions.volume import mod_volume
 from functions.kanyerest import get_kanye_quote
 from functions.browser_call import open_platform
 
@@ -43,6 +44,17 @@ def py_error_handler(filename, line, function, err, fmt):
 
 c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
 
+@contextmanager
+def noalsaerr():
+	try:
+		asound = cdll.LoadLibrary('libasound.so')
+		asound.snd_lib_error_set_hander(c_error_handler)
+		yield
+		asound.snd_lib_error_handler(None)
+	except:
+		yield
+		print("except in noalserr func")
+
 def speak(text, rate = 150): #rate can be varied of how fast ai speaks
     engine.setProperty('rate', rate)
     engine.say(text)
@@ -64,52 +76,54 @@ def parseCommand(lastCall):
             session = False
             playsound('./audio/jackSon_off.mp3')
 
-    listener = sr.Recognizer()
-    # speak("Listening for a command")
+    with noalserr():
 
-    with sr.Microphone() as source:
-        print("adjuting for ambient noise")
-        listener.adjust_for_ambient_noise(source, duration= 3)
-        listener.pause_threshold = 1
-        listener.energy_threshold = 300
-        print("listening for a command")
-        input_speech = listener.listen(source, timeout = None, phrase_time_limit = None)
+	    listener = sr.Recognizer()
+	    # speak("Listening for a command")
 
-    try: 
-        print("Recognizing speech... ")
-        query = listener.recognize_google(input_speech).lower().split()
-        print(f"The input speech was: {query}" )
-    
-    except Exception as exception:
-        # speak("I did not quite catch that")
-        print("I did not quite catch that")
-        print(exception)
-        print("returning None to main function")
-        # bad_listens += 1
-        return None
-    
-    # global lastCall
+	    with sr.Microphone() as source:
+	        print("adjuting for ambient noise")
+	        listener.adjust_for_ambient_noise(source, duration= 3)
+	        listener.pause_threshold = 1
+	        listener.energy_threshold = 300
+	        print("listening for a command")
+	        input_speech = listener.listen(source, timeout = None, phrase_time_limit = None)
 
-    # bad_listens = 0
-    
-    newCall = datetime.now().timestamp() * 1000
-    
-    print("new call minus last call is ", newCall - lastCall)
-    if newCall - lastCall <= 120000:
-        print("newCall has been made within 120 seconds, sending query")
-        lastCall = newCall
-        session = True
-        return query
-    elif activationword in query:
-        lastCall = newCall
-        if session == False:
-            print("session was false, and activation word was in query, powering on")
-            session = True
-            playsound('./audio/jackSon_on.mp3')
-        return query
-    else:
-        return None
-    
+	    try: 
+	        print("Recognizing speech... ")
+	        query = listener.recognize_google(input_speech).lower().split()
+	        print(f"The input speech was: {query}" )
+	    
+	    except Exception as exception:
+	        # speak("I did not quite catch that")
+	        print("I did not quite catch that")
+	        print(exception)
+	        print("returning None to main function")
+	        # bad_listens += 1
+	        return None
+	    
+	    # global lastCall
+
+	    # bad_listens = 0
+	    
+	    newCall = datetime.now().timestamp() * 1000
+	    
+	    print("new call minus last call is ", newCall - lastCall)
+	    if newCall - lastCall <= 120000:
+	        print("newCall has been made within 120 seconds, sending query")
+	        lastCall = newCall
+	        session = True
+	        return query
+	    elif activationword in query:
+	        lastCall = newCall
+	        if session == False:
+	            print("session was false, and activation word was in query, powering on")
+	            session = True
+	            playsound('./audio/jackSon_on.mp3')
+	        return query
+	    else:
+	        return None
+	    
 # Main Loop
 if __name__ == '__main__':
     playsound("./audio/" + get_greeting())
